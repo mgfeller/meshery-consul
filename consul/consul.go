@@ -19,6 +19,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/layer5io/meshery-consul/kit/helm"
+	"helm.sh/helm/v3/pkg/cli"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -337,6 +339,24 @@ func (iClient *Client) ApplyOperation(ctx context.Context, arReq *meshes.ApplyRu
 	var svcName, appName string
 
 	switch arReq.OpName {
+	case installConsulHelmCommand:
+		var settings *cli.EnvSettings
+		consulChart := helm.ChartSpec{
+			Url:         "https://helm.releases.hashicorp.com",
+			RepoName:    "hashicorp",
+			ChartName:   "consul",
+			ReleaseName: "hashicorp",
+			Namespace:   arReq.Namespace,
+			Args: map[string]string{
+				"values": path.Join("consul", "config_templates", op.templateName),
+			},
+		}
+		settings = helm.Settings(consulChart.Namespace)
+		helm.RepoAdd(consulChart.RepoName, consulChart.Url, settings)
+		helm.RepoUpdate(settings)
+		helm.InstallChart(consulChart.ReleaseName, consulChart.RepoName, consulChart.ChartName, consulChart.Args, settings)
+		return nil, nil
+
 	case customOpCommand:
 		yamlFileContents = arReq.CustomBody
 		isCustomOp = true

@@ -27,11 +27,12 @@ type supportedOperation struct {
 }
 
 const (
-	customOpCommand        = "custom"
-	installConsulCommand   = "consul_install"
-	installBookInfoCommand = "install_book_info"
-	installHTTPBinCommand  = "install_http_bin"
-	installImageHubCommand = "install_image_hub"
+	customOpCommand          = "custom"
+	installConsulCommand     = "consul_install"
+	installConsulHelmCommand = "consul_install_helm"
+	installBookInfoCommand   = "install_book_info"
+	installHTTPBinCommand    = "install_http_bin"
+	installImageHubCommand   = "install_image_hub"
 )
 
 var supportedOps = map[string]supportedOperation{
@@ -42,6 +43,11 @@ var supportedOps = map[string]supportedOperation{
 	installConsulCommand: {
 		name:         "Consul Connect: unsecured, 1 server, suitable for local exploration",
 		templateName: "consul.yaml",
+		opType:       meshes.OpCategory_INSTALL,
+	},
+	installConsulHelmCommand: {
+		name:         "Consul Connect: unsecured, 1 server, suitable for local exploration (Helm installation)",
+		templateName: "consul-values.yaml",
 		opType:       meshes.OpCategory_INSTALL,
 	},
 	installBookInfoCommand: {
