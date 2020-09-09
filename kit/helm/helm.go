@@ -18,19 +18,6 @@ package helm
 
 import (
 	"context"
-	"fmt"
-	"github.com/gofrs/flock"
-	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chart/loader"
-	"helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/cli/values"
-	"helm.sh/helm/v3/pkg/downloader"
-	"helm.sh/helm/v3/pkg/getter"
-	"helm.sh/helm/v3/pkg/repo"
-	"helm.sh/helm/v3/pkg/strvals"
 	"io/ioutil"
 	"log"
 	"os"
@@ -38,6 +25,22 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/gofrs/flock"
+	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
+	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/chart"
+	"helm.sh/helm/v3/pkg/chart/loader"
+	"helm.sh/helm/v3/pkg/downloader"
+	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/repo"
+	"helm.sh/helm/v3/pkg/strvals"
+
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/cli/values"
+
+	"fmt"
 )
 
 func Settings(namespace string) *cli.EnvSettings {
@@ -225,15 +228,14 @@ func isChartInstallable(ch *chart.Chart) (bool, error) {
 
 func debug(format string, v ...interface{}) {
 	format = fmt.Sprintf("[debug] %s\n", format)
-	log.Output(2, fmt.Sprintf(format, v...))
+	_ = log.Output(2, fmt.Sprintf(format, v...))
 }
 
 type ChartSpec struct {
-	Url         string            `json:"url"`
+	URL         string            `json:"url"`
 	RepoName    string            `json:"repoName"`
 	ChartName   string            `json:"chartName"`
 	ReleaseName string            `json:"releaseName"`
 	Namespace   string            `json:"nameSpace"`
 	Args        map[string]string `json:"args"`
 }
-

@@ -2,12 +2,13 @@ module github.com/layer5io/meshery-consul
 
 go 1.13
 
+replace github.com/docker/distribution => github.com/docker/distribution v2.7.1+incompatible
+
 require (
+	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/ghodss/yaml v1.0.0
 	github.com/gofrs/flock v0.8.0
 	github.com/golang/protobuf v1.4.2
-	github.com/googleapis/gnostic v0.3.1 // indirect
-	github.com/gophercloud/gophercloud v0.4.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.6.0
 	google.golang.org/grpc v1.31.1

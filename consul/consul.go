@@ -19,13 +19,14 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/layer5io/meshery-consul/kit/helm"
-	"helm.sh/helm/v3/pkg/cli"
 	"html/template"
 	"io"
 	"io/ioutil"
 	"path"
 	"time"
+
+	"github.com/layer5io/meshery-consul/kit/helm"
+	"helm.sh/helm/v3/pkg/cli"
 
 	"strings"
 
@@ -69,11 +70,11 @@ func (iClient *Client) MeshName(context.Context, *meshes.MeshNameRequest) (*mesh
 }
 
 func (iClient *Client) createResource(ctx context.Context, res schema.GroupVersionResource, data *unstructured.Unstructured) error {
-	_, err := iClient.k8sDynamicClient.Resource(res).Namespace(data.GetNamespace()).Create(data, metav1.CreateOptions{})
+	_, err := iClient.k8sDynamicClient.Resource(res).Namespace(data.GetNamespace()).Create(ctx, data, metav1.CreateOptions{})
 	if err != nil {
 		err = errors.Wrapf(err, "unable to create the requested resource, attempting operation without namespace")
 		logrus.Warn(err)
-		_, err = iClient.k8sDynamicClient.Resource(res).Create(data, metav1.CreateOptions{})
+		_, err = iClient.k8sDynamicClient.Resource(res).Create(ctx, data, metav1.CreateOptions{})
 		if err != nil {
 			err = errors.Wrapf(err, "unable to create the requested resource, attempting to update")
 			logrus.Error(err)
@@ -108,12 +109,12 @@ func (iClient *Client) deleteResource(ctx context.Context, res schema.GroupVersi
 		}
 	}
 
-	err := iClient.k8sDynamicClient.Resource(res).Namespace(data.GetNamespace()).Delete(data.GetName(), &metav1.DeleteOptions{})
+	err := iClient.k8sDynamicClient.Resource(res).Namespace(data.GetNamespace()).Delete(ctx, data.GetName(), metav1.DeleteOptions{})
 	if err != nil {
 		err = errors.Wrapf(err, "unable to delete the requested resource, attempting operation without namespace")
 		logrus.Warn(err)
 
-		err := iClient.k8sDynamicClient.Resource(res).Delete(data.GetName(), &metav1.DeleteOptions{})
+		err := iClient.k8sDynamicClient.Resource(res).Delete(ctx, data.GetName(), metav1.DeleteOptions{})
 		if err != nil {
 			err = errors.Wrapf(err, "unable to delete the requested resource")
 			logrus.Error(err)
@@ -125,12 +126,12 @@ func (iClient *Client) deleteResource(ctx context.Context, res schema.GroupVersi
 }
 
 func (iClient *Client) getResource(ctx context.Context, res schema.GroupVersionResource, data *unstructured.Unstructured) (*unstructured.Unstructured, error) {
-	data1, err := iClient.k8sDynamicClient.Resource(res).Namespace(data.GetNamespace()).Get(data.GetName(), metav1.GetOptions{})
+	data1, err := iClient.k8sDynamicClient.Resource(res).Namespace(data.GetNamespace()).Get(ctx, data.GetName(), metav1.GetOptions{})
 	if err != nil {
 		err = errors.Wrap(err, "unable to retrieve the resource with a matching name, attempting operation without namespace")
 		logrus.Warn(err)
 
-		data1, err = iClient.k8sDynamicClient.Resource(res).Get(data.GetName(), metav1.GetOptions{})
+		data1, err = iClient.k8sDynamicClient.Resource(res).Get(ctx, data.GetName(), metav1.GetOptions{})
 		if err != nil {
 			err = errors.Wrap(err, "unable to retrieve the resource with a matching name, while attempting to apply the config")
 			logrus.Error(err)
@@ -142,11 +143,11 @@ func (iClient *Client) getResource(ctx context.Context, res schema.GroupVersionR
 }
 
 func (iClient *Client) updateResource(ctx context.Context, res schema.GroupVersionResource, data *unstructured.Unstructured) error {
-	if _, err := iClient.k8sDynamicClient.Resource(res).Namespace(data.GetNamespace()).Update(data, metav1.UpdateOptions{}); err != nil {
+	if _, err := iClient.k8sDynamicClient.Resource(res).Namespace(data.GetNamespace()).Update(ctx, data, metav1.UpdateOptions{}); err != nil {
 		err = errors.Wrap(err, "unable to update resource with the given name, attempting operation without namespace")
 		logrus.Warn(err)
 
-		if _, err = iClient.k8sDynamicClient.Resource(res).Update(data, metav1.UpdateOptions{}); err != nil {
+		if _, err = iClient.k8sDynamicClient.Resource(res).Update(ctx, data, metav1.UpdateOptions{}); err != nil {
 			err = errors.Wrap(err, "unable to update resource with the given name, while attempting to apply the config")
 			logrus.Error(err)
 			return err
@@ -342,7 +343,7 @@ func (iClient *Client) ApplyOperation(ctx context.Context, arReq *meshes.ApplyRu
 	case installConsulHelmCommand:
 		var settings *cli.EnvSettings
 		consulChart := helm.ChartSpec{
-			Url:         "https://helm.releases.hashicorp.com",
+			URL:         "https://helm.releases.hashicorp.com",
 			RepoName:    "hashicorp",
 			ChartName:   "consul",
 			ReleaseName: "hashicorp",
@@ -352,7 +353,7 @@ func (iClient *Client) ApplyOperation(ctx context.Context, arReq *meshes.ApplyRu
 			},
 		}
 		settings = helm.Settings(consulChart.Namespace)
-		helm.RepoAdd(consulChart.RepoName, consulChart.Url, settings)
+		helm.RepoAdd(consulChart.RepoName, consulChart.URL, settings)
 		helm.RepoUpdate(settings)
 		helm.InstallChart(consulChart.ReleaseName, consulChart.RepoName, consulChart.ChartName, consulChart.Args, settings)
 		return nil, nil
