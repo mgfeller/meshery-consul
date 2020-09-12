@@ -25,7 +25,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/layer5io/meshery-consul/kit/helm"
+	"github.com/layer5io/meshery-consul/common/helm"
 	"helm.sh/helm/v3/pkg/cli"
 
 	"strings"

@@ -145,6 +145,8 @@ func RepoUpdate(settings *cli.EnvSettings) {
 // InstallChart
 func InstallChart(name, repo, chart string, args map[string]string, settings *cli.EnvSettings) {
 	// https://github.com/helm/helm/issues/6910
+	// https://stackoverflow.com/questions/59782217/run-helm3-client-from-in-cluster
+	// http://blog.johandry.com/post/build-k8s-client/
 	actionConfig := new(action.Configuration)
 	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
 		log.Fatal(err)
