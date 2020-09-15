@@ -11,6 +11,7 @@ require (
 	github.com/gophercloud/gophercloud v0.4.0 // indirect
 	github.com/imdario/mergo v0.3.7 // indirect
 	github.com/json-iterator/go v1.1.7 // indirect
+	github.com/mgfeller/common-adapter-library v0.0.0-20200915182505-7d01f3cc9750
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.6.0

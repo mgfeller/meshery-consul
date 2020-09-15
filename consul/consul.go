@@ -29,6 +29,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/layer5io/meshery-consul/meshes"
+	l5yaml "github.com/mgfeller/common-adapter-library/pkg/yaml"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -525,7 +526,7 @@ func (iClient *Client) StreamEvents(in *meshes.EventsRequest, stream meshes.Mesh
 }
 
 func (iClient *Client) splitYAML(yamlContents string) ([]string, error) {
-	yamlDecoder, ok := NewDocumentDecoder(ioutil.NopCloser(bytes.NewReader([]byte(yamlContents)))).(*YAMLDecoder)
+	yamlDecoder, ok := l5yaml.NewDocumentDecoder(ioutil.NopCloser(bytes.NewReader([]byte(yamlContents)))).(*l5yaml.Decoder)
 	if !ok {
 		err := fmt.Errorf("unable to create a yaml decoder")
 		logrus.Error(err)
