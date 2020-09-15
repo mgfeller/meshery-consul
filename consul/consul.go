@@ -20,8 +20,6 @@ import (
 	"context"
 	"fmt"
 	"html/template"
-	"io"
-	"io/ioutil"
 	"path"
 	"time"
 
@@ -156,7 +154,7 @@ func (iClient *Client) updateResource(ctx context.Context, res schema.GroupVersi
 }
 
 func (iClient *Client) applyConfigChange(ctx context.Context, yamlFileContents, namespace string, delete, isCustomOp bool) error {
-	yamls, err := iClient.splitYAML(yamlFileContents)
+	yamls, err := l5yaml.SplitYAML(yamlFileContents)
 	if err != nil {
 		err = errors.Wrap(err, "error while splitting yaml")
 		logrus.Error(err)
@@ -523,48 +521,6 @@ func (iClient *Client) StreamEvents(in *meshes.EventsRequest, stream meshes.Mesh
 		}
 		time.Sleep(500 * time.Millisecond)
 	}
-}
-
-func (iClient *Client) splitYAML(yamlContents string) ([]string, error) {
-	yamlDecoder, ok := l5yaml.NewDocumentDecoder(ioutil.NopCloser(bytes.NewReader([]byte(yamlContents)))).(*l5yaml.Decoder)
-	if !ok {
-		err := fmt.Errorf("unable to create a yaml decoder")
-		logrus.Error(err)
-		return nil, err
-	}
-	defer func() {
-		if err := yamlDecoder.Close(); err != nil {
-			logrus.Error(err)
-		}
-	}()
-	var err error
-	n := 0
-	data := [][]byte{}
-	ind := 0
-	for err == io.ErrShortBuffer || err == nil {
-		// for {
-		d := make([]byte, 1000)
-		n, err = yamlDecoder.Read(d)
-		// logrus.Debugf("Read this: %s, count: %d, err: %v", d, n, err)
-		if len(data) == 0 || len(data) <= ind {
-			data = append(data, []byte{})
-		}
-		if n > 0 {
-			data[ind] = append(data[ind], d...)
-		}
-		if err == nil {
-			logrus.Debugf("..............BOUNDARY................")
-			ind++
-		}
-	}
-	result := make([]string, len(data))
-	for i, row := range data {
-		r := string(row)
-		r = strings.Trim(r, "\x00")
-		logrus.Debugf("ind: %d, data: %s", i, r)
-		result[i] = r
-	}
-	return result, nil
 }
 
 func (iClient *Client) getSVCPort(ctx context.Context, svc, namespace string) ([]int64, error) {
