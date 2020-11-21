@@ -35,7 +35,7 @@ const (
 )
 
 var (
-	kubeConfigPath = fmt.Sprintf("%s/.kube/meshery.config", utils.GetHome())
+	kubeConfigPath = fmt.Sprintf("%s/.kube/config", utils.GetHome())
 )
 
 func main() {

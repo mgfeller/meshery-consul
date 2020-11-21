@@ -78,6 +78,16 @@ func (h *Handler) ApplyOperation(ctx context.Context, request adapter.OperationR
 			}
 		}
 		h.StreamInfo(e)
+	case config.ValidateSmiConformanceCommand:
+		err = h.ValidateSMIConformance(&adapter.SmiTestOptions{
+			Ctx:         ctx,
+			OpID:        request.OperationID,
+			Labels:      nil,
+			Annotations: nil,
+		})
+		if err != nil {
+			return err
+		}
 	default:
 		h.StreamErr(e, adapter.ErrOpInvalid)
 	}

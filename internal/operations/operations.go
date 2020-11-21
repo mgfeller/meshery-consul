@@ -51,5 +51,13 @@ var (
 				config.OperationTemplateNameKey: "image-hub.yaml",
 			},
 		},
+		config.ValidateSmiConformanceCommand: &adapter.Operation{
+			Type: int32(meshes.OpCategory_VALIDATE),
+			Properties: map[string]string{
+				config.OperationDescriptionKey:  "SMI Conformance Test",
+				config.OperationVersionKey:      "",
+				config.OperationTemplateNameKey: "",
+			},
+		},
 	}
 )
